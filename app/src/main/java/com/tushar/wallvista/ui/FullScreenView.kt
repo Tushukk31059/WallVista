@@ -1,0 +1,27 @@
+package com.tushar.wallvista.ui
+
+import android.os.Bundle
+import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.net.toUri
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import com.tushar.wallvista.R
+import com.tushar.wallvista.databinding.ActivityFullScreenViewBinding
+
+class FullScreenView : AppCompatActivity() {
+    private lateinit var binding:ActivityFullScreenViewBinding
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
+        binding=ActivityFullScreenViewBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
+        val uri=intent.getStringExtra("uri")
+        binding.img.setImageURI(uri?.toUri())
+    }
+}
