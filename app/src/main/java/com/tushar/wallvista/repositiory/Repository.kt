@@ -19,6 +19,12 @@ class Repository(private val dao: ImageDAO) {
             println("RoomInsert Inserting URI: $imageEntity")
             dao.insertImage(imageEntity)
         }
+    suspend fun deleteImage(imageEntity: ImageEntity){
+        dao.delete(imageEntity)
+    }
+    suspend fun deleteLockImage(lockEntity: LockImageEntity){
+        dao.deleteLockImage(lockEntity)
+    }
     suspend fun addLockImage(lockImageEntity: LockImageEntity) {
         println("RoomInsert Inserting URI: $lockImageEntity")
         dao.insertLockImage(lockImageEntity)

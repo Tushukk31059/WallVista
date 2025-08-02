@@ -51,7 +51,7 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this)[ImageVM::class.java]
-        adapter = ImageRecycler(emptyList())
+        adapter = ImageRecycler(emptyList(),viewModel)
         binding.pickBtn.setOnClickListener {
             pickImageFromGallery()
         }
@@ -64,14 +64,13 @@ class HomeFragment : Fragment() {
         viewModel.allImages.observe(viewLifecycleOwner) { images ->
             adapter.updateList(images)
         }
-        val request= PeriodicWorkRequestBuilder<WallWorker>(
-            15,TimeUnit.MINUTES
-        ).build()
-        WorkManager.getInstance(requireContext()).enqueueUniquePeriodicWork(
-            "wallpaper_work",
-            ExistingPeriodicWorkPolicy.KEEP,
-            request
-        )
+//        val request= PeriodicWorkRequestBuilder<WallWorker>(
+//            15,TimeUnit.MINUTES
+//        ).build()
+//        WorkManager.getInstance(requireContext())
+//            .enqueueUniquePeriodicWork("wallpaper_work", ExistingPeriodicWorkPolicy.REPLACE, request)
+//
+
     }
 
 

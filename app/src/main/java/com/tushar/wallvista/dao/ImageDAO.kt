@@ -2,6 +2,7 @@ package com.tushar.wallvista.dao
 
 import androidx.lifecycle.LiveData
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -21,6 +22,9 @@ interface ImageDAO {
     @Query("SELECT * FROM IMAGE_TABLE")
     fun getImages():List<ImageEntity>
 
+    @Delete
+    suspend fun delete(photo: ImageEntity)
+
     @Query("SELECT COUNT(*) FROM IMAGE_TABLE")
     suspend fun getCount(): Int
 
@@ -29,6 +33,9 @@ interface ImageDAO {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertSingleLockImage(obj:LockImageEntity)
+
+    @Delete
+    suspend fun deleteLockImage(photo: LockImageEntity)
     @Query("SELECT * FROM LOCK_TABLE")
     fun getLockImage():LiveData<List<LockImageEntity>>
 

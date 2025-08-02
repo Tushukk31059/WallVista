@@ -1,8 +1,10 @@
 package com.tushar.wallvista.adapter
 
+import android.content.Context
 import android.content.Intent
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -10,9 +12,11 @@ import com.tushar.wallvista.databinding.SingleWallpaperItemBinding
 import com.tushar.wallvista.domain.ImageEntity
 import androidx.core.net.toUri
 import com.tushar.wallvista.ui.FullScreenView
+import com.tushar.wallvista.viewmodels.ImageVM
 import java.io.File
+import androidx.core.content.edit
 
-class ImageRecycler(private var list: List<ImageEntity>) :
+class ImageRecycler(private var list: List<ImageEntity>, private val viewmodel: ImageVM) :
     RecyclerView.Adapter<ImageRecycler.ViewHolder>() {
     class ViewHolder(val binding: SingleWallpaperItemBinding) :
         RecyclerView.ViewHolder(binding.root)
@@ -28,6 +32,7 @@ class ImageRecycler(private var list: List<ImageEntity>) :
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+
         val uri = File(list[position].img)
         Glide.with(holder.itemView.context)
             .load(uri.toUri())
@@ -37,10 +42,25 @@ class ImageRecycler(private var list: List<ImageEntity>) :
             val intent = Intent(context, FullScreenView::class.java)
 
             intent.putExtra("position", position)
-            intent.putExtra("uri",uri)
+            intent.putExtra("uri",uri.absolutePath)
             context.startActivity(intent)
         }
+        holder.binding.img.setOnLongClickListener {
+            if (position!= RecyclerView.NO_POSITION){
+                val item=list[position]
+                AlertDialog.Builder(holder.binding.root.context)
+                    .setTitle("DELETE")
+                    .setMessage("Do You Want To Delete This Image?")
+                    .setPositiveButton("YES"){ _, _ ->
+                        viewmodel.deleteImg(item)
+                    }
+                    .setNegativeButton("NO",null)
+                    .show()
+            }
+            true
+        }
     }
+
 
 
     fun updateList(newList: List<ImageEntity>) {

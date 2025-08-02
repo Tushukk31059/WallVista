@@ -21,4 +21,9 @@ class LockImageVM(application: Application) : AndroidViewModel(application) {
             repository.addLockImage(lockImageEntity)
         }
     }
+    fun deleteImg(image: LockImageEntity){
+        viewModelScope.launch {
+            repository.deleteLockImage(image)
+        }
+    }
 }

@@ -3,6 +3,7 @@ package com.tushar.wallvista.adapter
 import android.content.Intent
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.core.net.toUri
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -11,14 +12,17 @@ import com.tushar.wallvista.databinding.SingleWallpaperItemBinding
 import com.tushar.wallvista.domain.ImageEntity
 import com.tushar.wallvista.domain.LockImageEntity
 import com.tushar.wallvista.ui.FullScreenView
+import com.tushar.wallvista.viewmodels.LockImageVM
 import java.io.File
 
-class LockAdapter(private var list: List<LockImageEntity>) :
-    RecyclerView.Adapter<LockAdapter.ViewHolder>()  {
-    class ViewHolder(val binding: SingleWallpaperItemBinding) :RecyclerView.ViewHolder(binding.root)
+class LockAdapter(private var list: List<LockImageEntity>,private val viewmodel: LockImageVM) :
+    RecyclerView.Adapter<LockAdapter.ViewHolder>() {
+    class ViewHolder(val binding: SingleWallpaperItemBinding) :
+        RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val binding=SingleWallpaperItemBinding.inflate(LayoutInflater.from(parent.context),parent,false)
+        val binding =
+            SingleWallpaperItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ViewHolder(binding)
     }
 
@@ -35,9 +39,26 @@ class LockAdapter(private var list: List<LockImageEntity>) :
             val context = holder.itemView.context
             val intent = Intent(context, FullScreenView::class.java)
             intent.putExtra("position", position)
-            intent.putExtra("uri",uri)
+            intent.putExtra("uri", uri)
             context.startActivity(intent)
-    }}
+
+
+        }
+        holder.binding.img.setOnLongClickListener {
+            if (position!= RecyclerView.NO_POSITION){
+                val item=list[position]
+                AlertDialog.Builder(holder.binding.root.context)
+                    .setTitle("DELETE")
+                    .setMessage("Do You Want To Delete This Image?")
+                    .setPositiveButton("YES"){ _, _ ->
+                        viewmodel.deleteImg(item)
+                    }
+                    .setNegativeButton("NO",null)
+                    .show()
+            }
+            true
+        }
+    }
 
 
     fun updateList(newList: List<LockImageEntity>) {
@@ -47,6 +68,7 @@ class LockAdapter(private var list: List<LockImageEntity>) :
             override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
                 return list[oldItemPosition].id == newList[newItemPosition].id
             }
+
             override fun areContentsTheSame(
                 oldItemPosition: Int,
                 newItemPosition: Int
@@ -58,4 +80,4 @@ class LockAdapter(private var list: List<LockImageEntity>) :
         list = newList
         diffResult.dispatchUpdatesTo(this)
     }
-    }
+}

@@ -8,6 +8,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.tushar.wallvista.R
 import com.tushar.wallvista.databinding.ActivityFullScreenViewBinding
+import java.io.File
 
 class FullScreenView : AppCompatActivity() {
     private lateinit var binding:ActivityFullScreenViewBinding
@@ -22,6 +23,9 @@ class FullScreenView : AppCompatActivity() {
             insets
         }
         val uri=intent.getStringExtra("uri")
-        binding.img.setImageURI(uri?.toUri())
+        val file= File(uri?:"")
+        if(file.exists()){
+            binding.img.setImageURI(uri?.toUri())
+        }
     }
 }

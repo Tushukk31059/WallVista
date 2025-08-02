@@ -22,5 +22,10 @@ class ImageVM(application: Application) : AndroidViewModel(application) {
             repository.addImage(imageEntity)
         }
     }
+    fun deleteImg(image: ImageEntity){
+        viewModelScope.launch {
+            repository.deleteImage(image)
+        }
+    }
 
 }

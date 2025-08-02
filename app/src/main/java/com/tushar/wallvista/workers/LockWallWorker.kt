@@ -17,52 +17,86 @@ import com.tushar.wallvista.databases.ImageDatabase
 import com.tushar.wallvista.repositiory.Repository
 import java.io.File
 
-class LockWallWorker (appContext: Context, workParams: WorkerParameters) :
+class LockWallWorker(appContext: Context, workParams: WorkerParameters) :
     Worker(appContext, workParams) {
     private val dao = ImageDatabase.createDatabase(appContext).imageDAO()
     private val repository: Repository = Repository(dao)
-    private val prefs = appContext.getSharedPreferences("lock_wallpaper_prefs", Context.MODE_PRIVATE)
+    private val lockPrefs =
+        appContext.getSharedPreferences("lock_wallpaper_prefs", Context.MODE_PRIVATE)
+    private val homePrefs = appContext.getSharedPreferences("wallpaper_prefs", Context.MODE_PRIVATE)
 
     @RequiresPermission(Manifest.permission.SET_WALLPAPER)
     override fun doWork(): Result {
-       println( "edrr running tasks")
+        println("edrr lock running tasks")
         val imageList = repository.getLockImages()
-        if (imageList.isNotEmpty()){
-            val lastIndex = prefs.getInt("last_index", -1)
+        if (imageList.isNotEmpty()) {
+            val lastIndex = lockPrefs.getInt("last_index", -1)
             val nextIndex = (lastIndex + 1) % imageList.size
             val selectedImage = imageList[nextIndex]
 
-            try{
+            try {
                 val file = File(selectedImage.img)
                 if (file.exists()) {
                     val bitmap = BitmapFactory.decodeFile(file.absolutePath)
                     val wallpaperManager = WallpaperManager.getInstance(applicationContext)
                     try {
                         wallpaperManager.setBitmap(bitmap, null, true, WallpaperManager.FLAG_LOCK)
-                    } catch (e: Exception) {
+                    } catch (_: Exception) {
                         Log.e("WallWorker", "Failed to set lock wallpaper, trying fallback")
                         wallpaperManager.setBitmap(bitmap) // fallback to home screen
                     }
                     // Save next index
-                    prefs.edit { putInt("last_index", nextIndex) }
+                    lockPrefs.edit { putInt("last_index", nextIndex) }
                     showNotification("LockScreen Wallpaper Changed")
 
                     Log.d("WallWorker", "Wallpaper set: ${file.absolutePath}")
                     return Result.success()
-                }else {
+                } else {
                     Log.e("WallWorker", "Image file not found: ${file.absolutePath}")
                 }
-            }catch (e: Exception) {
+            } catch (e: Exception) {
                 Log.e("WallWorker", "Error setting wallpaper", e)
             }
-        }else{
-            Log.d("WallWorker","no images found")
+        } else {
+            Log.d("WallWorker", "no images found")
         }
+///////////////////////////////////Home screen///////////////////////////////////////////////////
+
+        println("edrr home running tasks")
+        val homeImageList = repository.getImages()
+        if (homeImageList.isNotEmpty()) {
+            val lastIndex = homePrefs.getInt("last_index", -1)
+            val nextIndex = (lastIndex + 1) % homeImageList.size
+            val selectedImage = homeImageList[nextIndex]
+            try {
+                val file = File(selectedImage.img)
+                if (file.exists()) {
+                    val bitmap = BitmapFactory.decodeFile(file.absolutePath)
+                    val wallpaperManager = WallpaperManager.getInstance(applicationContext)
+                    wallpaperManager.setBitmap(bitmap, null, true, WallpaperManager.FLAG_SYSTEM)
+
+                    // Save next index
+                    homePrefs.edit { putInt("last_index", nextIndex) }
+                    showNotification("HomeScreen Wallpaper Changed")
+                    Log.d("WallWorker", "Wallpaper set: ${file.absolutePath}")
+                    return Result.success()
+                } else {
+                    Log.e("WallWorker", "Image file not found: ${file.absolutePath}")
+                }
+            } catch (e: Exception) {
+                Log.e("WallWorker", "Error setting wallpaper", e)
+            }
+        } else {
+            Log.d("WallWorker", "no images found")
+        }
+
 
         return Result.success()
     }
+
     private fun showNotification(message: String) {
-        val notificationManager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val notificationManager =
+            applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val channelId = "lock_wallpaper_channel"
 
         // Create notification channel (required for Android 8+)

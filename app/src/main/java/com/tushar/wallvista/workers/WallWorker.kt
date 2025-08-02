@@ -36,7 +36,7 @@ class WallWorker(appContext: Context, workParams: WorkerParameters) :
                 if (file.exists()) {
                     val bitmap = BitmapFactory.decodeFile(file.absolutePath)
                     val wallpaperManager = WallpaperManager.getInstance(applicationContext)
-                    wallpaperManager.setBitmap(bitmap,null,true,WallpaperManager.FLAG_LOCK)
+                    wallpaperManager.setBitmap(bitmap,null,true,WallpaperManager.FLAG_SYSTEM)
 
                     // Save next index
                     prefs.edit { putInt("last_index", nextIndex) }

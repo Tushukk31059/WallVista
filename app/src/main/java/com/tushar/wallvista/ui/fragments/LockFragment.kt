@@ -63,7 +63,7 @@ class LockFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this)[LockImageVM::class.java]
-        adapter = LockAdapter(emptyList())
+        adapter = LockAdapter(emptyList(),viewModel)
         binding.pickBtn.setOnClickListener {
             pickImageFromGallery()
         }
@@ -77,14 +77,14 @@ class LockFragment : Fragment() {
         viewModel.allLockImages.observe(viewLifecycleOwner) { images ->
             adapter.updateList(images)
         }
-        val request= PeriodicWorkRequestBuilder<LockWallWorker>(
-            15, TimeUnit.MINUTES
-        ).build()
-        WorkManager.getInstance(requireContext()).enqueueUniquePeriodicWork(
-            "wallpaper_work",
-            ExistingPeriodicWorkPolicy.KEEP,
-            request
-        )
+//        val request= PeriodicWorkRequestBuilder<LockWallWorker>(
+//            16, TimeUnit.MINUTES
+//        ).build()
+//        WorkManager.getInstance(requireContext()).enqueueUniquePeriodicWork(
+//            "wallpaper_work",
+//            ExistingPeriodicWorkPolicy.REPLACE,
+//            request
+//        )
     }
     private fun saveImage(uri: Uri): File?{
         return try {
