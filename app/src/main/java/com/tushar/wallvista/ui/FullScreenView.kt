@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.bumptech.glide.Glide
 import com.tushar.wallvista.R
 import com.tushar.wallvista.databinding.ActivityFullScreenViewBinding
 import java.io.File
@@ -25,7 +26,10 @@ class FullScreenView : AppCompatActivity() {
         val uri=intent.getStringExtra("uri")
         val file= File(uri?:"")
         if(file.exists()){
-            binding.img.setImageURI(uri?.toUri())
+            Glide.with(this)
+                .load(uri)
+                .into(binding.img)
+
         }
     }
 }
